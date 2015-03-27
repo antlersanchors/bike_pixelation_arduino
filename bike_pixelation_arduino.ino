@@ -53,5 +53,11 @@ void loop() {
 
 		sensorActive = false;
 
-	}
+	} 
+
+        if (currentTime - prevTime > 2000 && sensorVal > sensorThreshold) {
+         wheelSpeed = 1;
+        Serial.println(wheelSpeed);
+       delay(10); 
+        }
 }
