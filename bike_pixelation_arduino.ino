@@ -18,34 +18,36 @@ boolean sensorActive;
 int wheelSpeed;
 
 void setup() {
-  // put your setup code here, to run once:
-  pinMode(led, OUTPUT);
+ // put your setup code here, to run once:
+ pinMode(led, OUTPUT);
 
-  Serial.begin(9600);
+ Serial.begin(9600);
 
-  // initialize our timer
-  prevTime = 0;
-  currentTime = 0;
+ // initialize our timer
+ prevTime = 0;
+ currentTime = 0;
 
-  sensorActive = false;
-  sensorThreshold = 7;
+ sensorActive = false;
+ sensorThreshold = 7;
 
 }
 
 void loop() {
 
 	currentTime = millis();
+       timeDifference = currentTime - prevTime;
 
 	sensorVal = analogRead(hall);
+        
 
-	if (sensorVal < sensorThreshold && sensorActive == false) {
+	if (sensorVal < sensorThreshold && sensorActive == false && timeDifference > 150) {
 
 		sensorActive = true;
 
-		timeDifference = currentTime - prevTime;
-
-		wheelSpeed = map(timeDifference, 150, 680, 1023, 0);
-		Serial.println(wheelSpeed);
+ 		wheelSpeed = int(map(timeDifference, 150, 680, 16, 1));
+               wheelSpeed = constrain(wheelSpeed, 1, 16);
+ 		Serial.write(wheelSpeed);
+ 		//Serial.write(10);
 
 		prevTime = currentTime;
 
@@ -53,11 +55,12 @@ void loop() {
 
 		sensorActive = false;
 
-	} 
+	}
 
-        if (currentTime - prevTime > 2000 && sensorVal > sensorThreshold) {
+       // if wheel hasn't turned in a while, send a value of maximum slowness
+       if (currentTime - prevTime > 2000 && sensorVal > sensorThreshold) {
          wheelSpeed = 1;
-        Serial.println(wheelSpeed);
-       delay(10); 
-        }
+         Serial.write(wheelSpeed);
+         delay(100);
+       }
 }
